@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+joblib
+numpy
+requests
+scikit-learn

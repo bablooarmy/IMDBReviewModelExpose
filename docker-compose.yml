@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  # 1. OpenVINO Model Server Container
+  ovms:
+    image: openvino/model_server:latest
+    container_name: ovms_container
+    ports:
+      - "8001:8001"
+      - "8091:8091"
+    volumes:
+      - ./model_repository:/models
+    command: --model_name movie_review_sentiment_model --model_path /models/movie_review_sentiment_model --port 8001 --rest_port 8091
+
+  # 2. Your Custom FastAPI Sentiment API Container
+  sentiment-api:
+    build: .
+    container_name: sentiment_api_container
+    ports:
+      - "9898:9898"
+    environment:
+      - OVMS_URL=http://ovms:8091/v2/models/movie_review_sentiment_model/infer
+      - VECTORIZER_PATH=tfidf_vectorizer.pkl
+    depends_on:
+      - ovms
